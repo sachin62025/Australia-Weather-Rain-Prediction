@@ -39,3 +39,22 @@ This project predicts whether it will rain tomorrow in Australia using historica
 ```bash
 git clone https://github.com/your-username/Australia-Weather-Rain-Prediction.git
 cd Australia-Weather-Rain-Prediction
+```
+### 2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+### 3. Run the application
+```bash
+python application.py
+```
+## 🐳 Docker Support
+### Build Docker Image
+```bash
+docker build -t weather-rain-predictor .
+````
+### Run Container
+```bash
+docker run -p 5000:5000 weather-rain-predictor
+```
+
