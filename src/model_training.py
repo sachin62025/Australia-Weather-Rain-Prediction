@@ -4,6 +4,7 @@ import xgboost as xgb
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from src.logger import get_logger
 from src.custom_exception import CustomException
+from sklearn.model_selection import RandomizedSearchCV
 
 logger = get_logger(__name__)
 
@@ -34,17 +35,54 @@ class ModelTraining:
             logger.error(f"Error while loading data {e}")
             raise CustomException("Failed to load Data ", e)
         
+    # def train_model(self):
+    #     try:
+    #         self.model.fit(self.X_train,self.y_train)
+
+    #         joblib.dump(self.model , os.path.join(self.output_path,"model.pkl"))
+
+    #         logger.info("Training and saving of model done...")
+    #     except Exception as e:
+    #         logger.error(f"Error while training model {e}")
+    #         raise CustomException("Failed to train model ", e)
+
     def train_model(self):
         try:
-            self.model.fit(self.X_train,self.y_train)
+            param_dist = {
+                "n_estimators": [50, 100, 200],
+                "max_depth": [3, 5, 7, 10],
+                "learning_rate": [0.01, 0.05, 0.1, 0.2],
+                "subsample": [0.6, 0.8, 1.0],
+                "colsample_bytree": [0.6, 0.8, 1.0],
+                "gamma": [0, 0.1, 0.2],
+                "reg_lambda": [1, 1.5, 2],
+                "reg_alpha": [0, 0.1, 0.5]
+            }
 
-            joblib.dump(self.model , os.path.join(self.output_path,"model.pkl"))
+            random_search = RandomizedSearchCV(
+                estimator=self.model,
+                param_distributions=param_dist,
+                n_iter=20,
+                scoring='accuracy',
+                cv=5,
+                verbose=1,
+                random_state=42,
+                n_jobs=-1
+            )
 
-            logger.info("Training and saving of model done...")
+            random_search.fit(self.X_train, self.y_train)
+            self.model = random_search.best_estimator_
+
+            joblib.dump(self.model, os.path.join(self.output_path, "model.pkl"))
+            logger.info(f"Training and hyperparameter tuning done. Best params: {random_search.best_params_}")
+
         except Exception as e:
             logger.error(f"Error while training model {e}")
             raise CustomException("Failed to train model ", e)
-        
+
+
+
+
     def eval_model(self):
         try:
             training_score = self.model.score(self.X_train,self.y_train)
