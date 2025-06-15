@@ -37,7 +37,7 @@ This project predicts whether it will rain tomorrow in Australia using historica
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/Australia-Weather-Rain-Prediction.git
+https://github.com/sachin62025/Australia-Weather-Rain-Prediction.git
 cd Australia-Weather-Rain-Prediction
 ```
 ### 2. Install dependencies
