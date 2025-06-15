@@ -23,7 +23,14 @@ jobs:
               echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
               gcloud auth activate-service-account --key-file=gcp-key.json
               gcloud auth configure-docker us-central1-docker.pkg.dev || gcloud auth configure-docker
-
+      - run:
+          name: Create Artifact Registry repository if missing
+          command: |
+              gcloud artifacts repositories describe mlops-app --location=us-central1 || \
+              gcloud artifacts repositories create mlops-app \
+                --repository-format=docker \
+                --location=us-central1 \
+                --description="Docker repository for mlops-app"
       - run:
           name: Build and Push Image
           command: |
@@ -41,7 +48,6 @@ jobs:
               echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
               gcloud auth activate-service-account --key-file=gcp-key.json
               gcloud auth configure-docker us-central1-docker.pkg.dev || gcloud auth configure-docker
-      
       - run:
           name: Configure GKE
           command: |
@@ -62,10 +68,3 @@ workflows:
       - deploy_to_gke:
           requires:
             - build_docker_image
-
-    
-
-
-
-
-
